@@ -11,13 +11,13 @@ const UPLOAD_TYPES = [
     id: 'zoom',
     label: '줌공부',
     emoji: '🌿',
-    description: '주민 한 명이 공부하는 순간 (15초 이내, 루프 재생)',
+    description: '주민 한 명이 공부하는 순간 (1분 이내, 루프 재생)',
   },
   {
     id: 'concept',
     label: '컨셉영상',
     emoji: '🎬',
-    description: '여러 주민이 함께 있는 분위기 장면 (15초 이내, 루프 재생)',
+    description: '여러 주민이 함께 있는 분위기 장면 (1분 이내, 루프 재생)',
   },
 ];
 
@@ -72,8 +72,8 @@ export default function UploadPage() {
 
     const video = document.createElement('video');
     video.onloadedmetadata = () => {
-      if (video.duration > 15) {
-        setError('15초 이내의 영상만 업로드할 수 있어요.');
+      if (video.duration > 60) {
+        setError('1분 이내의 영상만 업로드할 수 있어요.');
         return;
       }
       setVideoFile(file);
@@ -164,7 +164,7 @@ export default function UploadPage() {
 
             <div>
               <label className="block text-sm font-semibold text-warm-brown mb-2">
-                영상 파일 <span className="text-muted font-normal">(15초 이내, 루프 재생)</span>
+                영상 파일 <span className="text-muted font-normal">(1분 이내, 루프 재생)</span>
               </label>
               <label className={`upload-zone block cursor-pointer rounded-xl overflow-hidden border border-sand ${videoPreview ? 'upload-zone-filled' : ''}`}>
                 {videoPreview ? (

@@ -14,7 +14,7 @@ const FALLBACK_CONCEPT_VIDEOS = [
   { id: 2, title: '학교 공부방2', videoUrl: '/dongsoop_study_2.mp4' },
   { id: 3, title: '학교 공부방3', videoUrl: '/dongsoop_study_3.mp4' },
   { id: 4, title: '학교 공부방4', videoUrl: '/dongsoop_study_4.mp4' },
-  { id: 5, title: '다락방 빗소리', videoUrl: null },
+  { id: 5, title: '학교 공부방5', videoUrl: '/dongsoop_study_5.mp4' },
   { id: 6, title: '박물관 조용한 오전', videoUrl: null },
 ];
 
