@@ -1,0 +1,310 @@
+/* Pretendard: 한국어에 최적화된 폰트. CDN에서 불러옴 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+/* Tailwind의 모든 유틸리티 클래스를 사용 가능하게 불러옴 */
+@import 'tailwindcss';
+
+/*
+  @theme: 프로젝트 전용 디자인 토큰을 등록하는 블록
+  여기에 등록하면 Tailwind 클래스로 바로 사용 가능
+  예) --color-leaf → bg-leaf, text-leaf, border-leaf 등으로 사용
+*/
+@theme {
+  /* 배경 / 기본 색상 */
+  --color-cream: #f5f3ee; /* 전체 배경색 (아이보리) */
+  --color-sage: #7ea87b; /* 연한 초록 (보조 강조) */
+  --color-leaf: #4a7c59; /* 진한 초록 (버튼, 주요 UI) */
+  --color-leaf-dark: #3a6547; /* leaf hover 상태 */
+  --color-warm-brown: #3d3530; /* 제목 등 주요 텍스트 */
+  --color-sand: #e2d9c8; /* 테두리, 구분선 */
+  --color-sky: #a8c8e0; /* 하늘색 포인트 */
+  --color-muted: #7a7670; /* 보조 텍스트 (회색) */
+  --color-peach: #f2c9a0; /* 복숭아색 포인트 */
+  --color-lilac: #c5b8e8; /* 라일락 포인트 */
+
+  /* 기본 폰트. -apple-system은 폰트 로드 실패 시 시스템 폰트로 fallback */
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+}
+
+/* ── Keyframes ───────────────────────────────────────────────────────────────
+   @keyframes: 애니메이션의 시작~끝 동작을 정의.
+   실제 적용은 아래 유틸리티 클래스에서 animation 속성으로 연결함.
+────────────────────────────────────────────────────────────────────────────── */
+
+/* 무한 가로 스크롤 (영상 카드 캐러셀에서 사용) */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* -50%: 카드 목록을 2번 복제해서 붙여놓고 절반만큼 이동 → 자연스럽게 반복 */
+    transform: translateX(-50%);
+  }
+}
+
+/* 위아래로 둥실 뜨는 효과 (이모지, 카드 등에서 사용) */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px); /* 최대 12px 위로 이동 */
+  }
+}
+
+/* 버튼 위에 빛이 스쳐지나가는 반짝임 효과 */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-150%) skewX(-15deg); /* 왼쪽 바깥에서 시작 */
+  }
+  100% {
+    transform: translateX(220%) skewX(-15deg); /* 오른쪽 바깥으로 퇴장 */
+  }
+}
+
+/* 아래에서 위로 스르륵 나타나는 등장 효과 */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px); /* 16px 아래에서 시작 */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 바깥으로 퍼지는 원형 pulse 효과 (뱃지, 알림 등에서 사용) */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(126, 168, 123, 0.5); /* 작고 진한 그림자 */
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(126, 168, 123, 0); /* 퍼지면서 투명해짐 */
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(126, 168, 123, 0);
+  }
+}
+
+/* 테두리 색이 sand ↔ sage로 반짝이는 효과 (업로드 영역에서 사용) */
+@keyframes border-pulse {
+  0%,
+  100% {
+    border-color: #e2d9c8; /* sand */
+  }
+  50% {
+    border-color: #7ea87b; /* sage */
+  }
+}
+
+/* 이퀄라이저 바 3개가 서로 다른 타이밍으로 올라갔다 내려옴 */
+@keyframes equalize1 {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes equalize2 {
+  0%,
+  100% {
+    transform: scaleY(0.7);
+  }
+  25% {
+    transform: scaleY(0.2);
+  }
+  75% {
+    transform: scaleY(1);
+  }
+}
+@keyframes equalize3 {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  33% {
+    transform: scaleY(1);
+  }
+  66% {
+    transform: scaleY(0.2);
+  }
+}
+
+/* ── Utility Classes ─────────────────────────────────────────────────────────
+   Tailwind에 없는 커스텀 클래스들.
+   JSX에서 className="animate-float" 처럼 일반 클래스처럼 사용.
+────────────────────────────────────────────────────────────────────────────── */
+
+/* float 애니메이션 적용 (3초 주기, 무한 반복) */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+/* 여러 요소가 같은 애니메이션을 쓸 때 시작 시점을 엇갈리게 해서 자연스러움 */
+.float-delay-1 {
+  animation-delay: 0.6s;
+}
+.float-delay-2 {
+  animation-delay: 1.2s;
+}
+.float-delay-3 {
+  animation-delay: 1.8s;
+}
+.float-delay-4 {
+  animation-delay: 2.4s;
+}
+
+/* fadeSlideUp 애니메이션 적용 */
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.38s ease-out both;
+}
+/* 리스트 아이템이 순서대로 등장할 때 딜레이를 다르게 줌 */
+.anim-delay-1 {
+  animation-delay: 0.08s;
+}
+.anim-delay-2 {
+  animation-delay: 0.16s;
+}
+.anim-delay-3 {
+  animation-delay: 0.24s;
+}
+.anim-delay-4 {
+  animation-delay: 0.32s;
+}
+.anim-delay-5 {
+  animation-delay: 0.4s;
+}
+
+/* 무한 가로 스크롤 트랙. width: max-content로 콘텐츠 너비만큼 늘어남 */
+.marquee-track {
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+/* 버튼 hover 시 빛이 스쳐지나가는 shimmer 효과 */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden; /* ::after 가상 요소가 버튼 밖으로 넘치지 않도록 */
+}
+/* ::after: 실제 DOM 요소 없이 CSS만으로 빛 줄기 요소를 만듦 */
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    /* 반투명 흰색 줄기 */ transparent
+  );
+  transform: translateX(-150%) skewX(-15deg); /* 초기 위치: 왼쪽 바깥 */
+  pointer-events: none; /* 클릭 이벤트를 버튼으로 통과시킴 */
+}
+.btn-shimmer:hover::after {
+  animation: shimmer 0.65s ease-out;
+}
+
+/* pulse-ring 애니메이션 적용 (뱃지 등의 주의를 끄는 효과) */
+.step-pulse {
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+/* VideoCard 하단의 이퀄라이저 바 기본 스타일 */
+.equalizer-bar {
+  display: inline-block;
+  width: 5px;
+  height: 20px;
+  border-radius: 3px 3px 0 0;
+  transform-origin: bottom; /* scaleY 변형 시 아래쪽 기준으로 늘어남 */
+  background-color: rgba(126, 168, 123, 0.55);
+  transition: background-color 0.2s;
+}
+/* 부모에 group 클래스가 있을 때 hover 시 색상 진하게 */
+.group:hover .equalizer-bar {
+  background-color: rgba(74, 124, 89, 0.75);
+}
+/* 3개 바가 각각 다른 keyframe + 딜레이로 제각각 움직임 */
+.equalizer-bar-1 {
+  animation: equalize1 1.2s ease-in-out infinite;
+}
+.equalizer-bar-2 {
+  animation: equalize2 1s ease-in-out infinite;
+  animation-delay: 0.18s;
+}
+.equalizer-bar-3 {
+  animation: equalize3 1.35s ease-in-out infinite;
+  animation-delay: 0.36s;
+}
+
+/* 영상 업로드 드래그앤드롭 영역 */
+.upload-zone {
+  border: 2px dashed #e2d9c8; /* 점선 테두리 */
+  transition: border-color 0.3s ease;
+}
+/* 파일이 없을 때: 테두리가 천천히 반짝임 */
+.upload-zone:not(.upload-zone-filled) {
+  animation: border-pulse 3s ease-in-out infinite;
+}
+/* hover 시: 반짝임 멈추고 sage 색으로 고정 */
+.upload-zone:not(.upload-zone-filled):hover {
+  animation: none;
+  border-color: #7ea87b;
+}
+/* 파일이 선택됐을 때: 실선 + leaf 색으로 변경 */
+.upload-zone-filled {
+  border: 2px solid #4a7c59;
+}
+
+/* 카드 배경에 깔리는 점 패턴 (radial-gradient로 동그란 점을 규칙적으로 배치) */
+.dot-pattern {
+  background-image: radial-gradient(
+    circle,
+    rgba(126, 168, 123, 0.35) 1px,
+    /* 점 크기 1px */ transparent 1px
+  );
+  background-size: 18px 18px; /* 점 간격 18px */
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────────
+   전역 기본 스타일
+────────────────────────────────────────────────────────────────────────────── */
+
+/* 모든 요소의 크기 계산 방식을 border-box로 통일 (padding이 크기에 포함됨) */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cream);
+  color: #2d2926;
+  -webkit-font-smoothing: antialiased; /* macOS/iOS 폰트 렌더링 부드럽게 */
+  -moz-osx-font-smoothing: grayscale; /* Firefox macOS 폰트 렌더링 */
+  letter-spacing: -0.01em; /* 자간 살짝 좁게 (한국어에 자연스러움) */
+}
+
+/* React 앱이 마운트되는 루트 요소. 최소 높이를 화면 전체로 */
+#root {
+  min-height: 100vh;
+}
+
+/* 스크롤바 커스터마이징 (Chrome/Safari 전용) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cream); /* 스크롤바 배경 */
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-sand); /* 스크롤바 막대 */
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sage); /* hover 시 초록으로 */
+}
