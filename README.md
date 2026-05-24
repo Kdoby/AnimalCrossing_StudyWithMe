@@ -14,16 +14,26 @@
 
 ## 기술 스택
 
-- React 19 + Vite
-- TailwindCSS v4
-- React Router v7
-- TanStack Query v5
-- Axios
+| | 기술 |
+|---|---|
+| Frontend | React 19, Vite, TailwindCSS v4, React Router v7, TanStack Query v5 |
+| Backend | Node.js, Express |
+| Database | MySQL + Sequelize |
 
 ## 시작하기
 
+**프론트엔드**
 ```bash
+cd client
 npm install
+npm run dev
+```
+
+**백엔드**
+```bash
+cd server
+npm install
+cp .env.example .env  # DB 설정 입력
 npm run dev
 ```
 
@@ -33,8 +43,8 @@ npm run dev
 직접 포착한 영상 클립을 아래 경로에 추가하세요.
 
 ```
-public/          ← 영상 파일 (.mp4)
-public/bgm.mp3   ← 배경 BGM
+client/public/         ← 영상 파일 (.mp4)
+client/public/bgm.mp3  ← 배경 BGM
 ```
 
 ## 라이선스
