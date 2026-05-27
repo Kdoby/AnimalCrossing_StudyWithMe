@@ -1,64 +1,45 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { Video } from '../models/index.js';
+import { VideoService } from "../services/videoService.js";
+import { streamFile } from "../utils/streamFile.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.join(__dirname, '../uploads');
-
-export async function uploadVideo(req, res) {
-  if (!req.file) {
-    return res.status(400).json({ error: '파일이 없습니다.' });
-  }
+export async function getVideos(req, res) {
   try {
-    const video = await Video.create({
-      filename: req.file.filename,
-      original_name: req.file.originalname,
-      is_sample: false,
-    });
-    res.json({ id: video.id, url: `/uploads/${video.filename}` });
+    res.json(await VideoService.getAll(req.query.sort));
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '저장에 실패했습니다.' });
+    res.status(500).json({ error: "영상 목록을 불러오지 못했습니다." });
+  }
+}
+
+export async function uploadVideo(req, res) {
+  if (!req.files?.video?.[0]) return res.status(400).json({ error: "파일이 없습니다." });
+  if (!req.body.title?.trim()) return res.status(400).json({ error: "영상 제목이 없습니다." });
+  if (!req.body.animalName?.trim()) return res.status(400).json({ error: "주민 이름이 없습니다." });
+  try {
+    res.json(await VideoService.createVideo(req.body, req.files));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "저장에 실패했습니다." });
   }
 }
 
 export async function getSamples(req, res) {
   try {
-    const samples = await Video.findAll({ where: { is_sample: true } });
-    res.json(samples.map((v) => ({ id: v.id, url: `/uploads/${v.filename}` })));
+    res.json(await VideoService.getSamples());
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: '샘플 영상을 불러오지 못했습니다.' });
+    res.status(500).json({ error: "샘플 영상을 불러오지 못했습니다." });
   }
 }
 
-export function streamVideo(req, res) {
-  const { id } = req.params;
-  Video.findByPk(id).then((video) => {
-    if (!video) return res.status(404).json({ error: '영상을 찾을 수 없습니다.' });
-
-    const filePath = path.join(UPLOADS_DIR, video.filename);
-    if (!fs.existsSync(filePath)) return res.status(404).json({ error: '파일이 없습니다.' });
-
-    const stat = fs.statSync(filePath);
-    const range = req.headers.range;
-
-    if (range) {
-      const [startStr, endStr] = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(startStr, 10);
-      const end = endStr ? parseInt(endStr, 10) : stat.size - 1;
-      const chunkSize = end - start + 1;
-      res.writeHead(206, {
-        'Content-Range': `bytes ${start}-${end}/${stat.size}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunkSize,
-        'Content-Type': 'video/mp4',
-      });
-      fs.createReadStream(filePath, { start, end }).pipe(res);
-    } else {
-      res.writeHead(200, { 'Content-Length': stat.size, 'Content-Type': 'video/mp4' });
-      fs.createReadStream(filePath).pipe(res);
-    }
-  });
+export async function streamVideo(req, res) {
+  try {
+    // 실제 파일 리소스로 매핑
+    const filePath = await VideoService.getFilePath(req.params.id);
+    if (!filePath)
+      return res.status(404).json({ error: "영상을 찾을 수 없습니다." });
+    streamFile(req, res, filePath);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "스트리밍에 실패했습니다." });
+  }
 }
