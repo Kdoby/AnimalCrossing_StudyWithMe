@@ -7,16 +7,7 @@ const THEMES = [
 
 const FLOAT_DELAYS = ['float-delay-1', 'float-delay-2', 'float-delay-3', 'float-delay-4'];
 
-function formatDuration(minutes) {
-  if (!minutes) return null;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h > 0 && m > 0) return `${h}시간 ${m}분`;
-  if (h > 0) return `${h}시간`;
-  return `${m}분`;
-}
-
-export default function ConceptVideoCard({ title, duration, index = 0, selected = false, onSelect }) {
+export default function ConceptVideoCard({ title, thumbnailUrl, duration, index = 0, selected = false, onSelect }) {
   const theme = THEMES[index % THEMES.length];
   const delayClass = FLOAT_DELAYS[index % 4];
 
@@ -32,17 +23,27 @@ export default function ConceptVideoCard({ title, duration, index = 0, selected 
         </div>
       )}
 
-      <div className={`relative w-full h-40 bg-gradient-to-br ${theme.gradient} flex items-center justify-center`}>
-        <div className="absolute inset-0 dot-pattern opacity-20 pointer-events-none" />
-        <span className={`relative text-5xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300 animate-float ${delayClass}`}>
-          {theme.icon}
-        </span>
+      <div className={`relative w-full h-40 bg-gradient-to-br ${theme.gradient} flex items-center justify-center overflow-hidden`}>
+        {thumbnailUrl ? (
+          <img
+            src={thumbnailUrl}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <>
+            <div className="absolute inset-0 dot-pattern opacity-20 pointer-events-none" />
+            <span className={`relative text-5xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300 animate-float ${delayClass}`}>
+              {theme.icon}
+            </span>
+          </>
+        )}
       </div>
 
       <div className="bg-white px-4 py-3">
         <p className="text-sm font-semibold text-warm-brown truncate">{title}</p>
-        {duration && (
-          <p className="text-xs text-muted mt-0.5">{formatDuration(duration)}</p>
+        {duration != null && (
+          <p className="text-xs text-muted mt-0.5">{duration}분</p>
         )}
       </div>
     </div>
