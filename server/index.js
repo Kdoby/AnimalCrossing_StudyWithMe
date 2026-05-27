@@ -1,26 +1,13 @@
-import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import videoRoutes from './routes/videos.js';
-import conceptVideoRoutes from './routes/conceptVideos.js';
-import audioRoutes from './routes/audio.js';
-import { syncDB } from './models/index.js';
+import app from './app.js';
+import { syncDB } from './config/database.js';
+import { specs, swaggerUi } from './config/swagger.js';
 
 dotenv.config();
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors({ origin: 'http://localhost:5173' }));
-app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.use('/api/videos', videoRoutes);
-app.use('/api/concept-videos', conceptVideoRoutes);
-app.use('/api/audio', audioRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 syncDB()
   .then(() => {
