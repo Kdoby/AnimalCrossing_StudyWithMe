@@ -7,4 +7,7 @@ export const queryKeys = {
     all: ['conceptVideos'],
     list: (params) => ['conceptVideos', 'list', params],
   },
+  audio: {
+    list: () => ['audio', 'list'],
+  },
 };

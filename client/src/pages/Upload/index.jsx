@@ -27,7 +27,8 @@ export default function UploadPage() {
   const [uploadType, setUploadType] = useState(null);
 
   // 줌공부용 필드
-  const [villagerName, setVillagerName] = useState('');
+  const [title, setTitle] = useState('');
+  const [animalName, setAnimalName] = useState('');
 
   // 컨셉영상용 필드
   const [conceptTitle, setConceptTitle] = useState('');
@@ -84,17 +85,37 @@ export default function UploadPage() {
   };
 
   const handleSubmit = () => {
+    // 줌 스터디
     if (uploadType === 'zoom') {
-      if (!villagerName.trim()) { setError('주민 이름을 입력해주세요.'); return; }
-      if (!videoFile) { setError('영상 파일을 선택해주세요.'); return; }
+      if (!title.trim()) {
+        setError('영상 제목을 입력해주세요.');
+        return;
+      }
+      if (!animalName.trim()) {
+        setError('주민 이름을 입력해주세요.');
+        return;
+      }
+      if (!videoFile) {
+        setError('영상 파일을 선택해주세요.');
+        return;
+      }
       const formData = new FormData();
-      formData.append('villagerName', villagerName.trim());
+      formData.append('title', title.trim());
+      formData.append('animalName', animalName.trim());
       formData.append('video', videoFile);
       if (thumbnailFile) formData.append('thumbnail', thumbnailFile);
       mutateZoom(formData);
-    } else {
-      if (!conceptTitle.trim()) { setError('영상 제목을 입력해주세요.'); return; }
-      if (!videoFile) { setError('영상 파일을 선택해주세요.'); return; }
+    }
+    // 컨셉 영상 스터디
+    else {
+      if (!conceptTitle.trim()) {
+        setError('영상 제목을 입력해주세요.');
+        return;
+      }
+      if (!videoFile) {
+        setError('영상 파일을 선택해주세요.');
+        return;
+      }
       const formData = new FormData();
       formData.append('title', conceptTitle.trim());
       formData.append('video', videoFile);
@@ -108,7 +129,9 @@ export default function UploadPage() {
       <div className="max-w-lg mx-auto px-6 py-12">
         <BackButton onClick={() => navigate('/')} />
 
-        <h1 className="text-2xl font-bold text-warm-brown mt-6 mb-2">영상 업로드</h1>
+        <h1 className="text-2xl font-bold text-warm-brown mt-6 mb-2">
+          영상 업로드
+        </h1>
         <p className="text-sm text-muted mb-8">어떤 종류의 영상을 올릴까요?</p>
 
         {/* 업로드 유형 선택 */}
@@ -120,16 +143,21 @@ export default function UploadPage() {
                 key={type.id}
                 onClick={() => handleTypeSelect(type.id)}
                 className={`text-left rounded-2xl border-2 px-4 py-4 transition-all duration-200 cursor-pointer
-                  ${selected
-                    ? 'border-leaf bg-leaf/5 shadow-sm'
-                    : 'border-sand bg-white hover:border-sage hover:bg-sage/5'
+                  ${
+                    selected
+                      ? 'border-leaf bg-leaf/5 shadow-sm'
+                      : 'border-sand bg-white hover:border-sage hover:bg-sage/5'
                   }`}
               >
                 <span className="text-2xl block mb-2">{type.emoji}</span>
-                <p className={`text-sm font-bold mb-0.5 ${selected ? 'text-leaf' : 'text-warm-brown'}`}>
+                <p
+                  className={`text-sm font-bold mb-0.5 ${selected ? 'text-leaf' : 'text-warm-brown'}`}
+                >
                   {type.label}
                 </p>
-                <p className="text-xs text-muted leading-snug">{type.description}</p>
+                <p className="text-xs text-muted leading-snug">
+                  {type.description}
+                </p>
               </button>
             );
           })}
@@ -140,18 +168,32 @@ export default function UploadPage() {
           <div className="flex flex-col gap-5">
             {uploadType === 'zoom' ? (
               <div>
-                <label className="block text-sm font-semibold text-warm-brown mb-2">주민 이름</label>
+                <label className="block text-sm font-semibold text-warm-brown mb-2">
+                  제목
+                </label>
                 <input
                   type="text"
-                  value={villagerName}
-                  onChange={(e) => setVillagerName(e.target.value)}
-                  placeholder="예: 너굴, 여욱, 코코"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="예: 도서관에서 공부하는 쭈니"
+                  className="w-full px-4 py-3 rounded-xl border border-sand bg-white text-warm-brown text-sm placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-leaf/40 transition-all duration-200"
+                />
+                <label className="block text-sm font-semibold text-warm-brown mt-5 mb-2">
+                  주민 이름
+                </label>
+                <input
+                  type="text"
+                  value={animalName}
+                  onChange={(e) => setAnimalName(e.target.value)}
+                  placeholder="예: 쭈니, 잭슨, 미첼"
                   className="w-full px-4 py-3 rounded-xl border border-sand bg-white text-warm-brown text-sm placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-leaf/40 transition-all duration-200"
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-sm font-semibold text-warm-brown mb-2">장소 / 분위기 이름</label>
+                <label className="block text-sm font-semibold text-warm-brown mb-2">
+                  장소 / 분위기 이름
+                </label>
                 <input
                   type="text"
                   value={conceptTitle}
@@ -164,18 +206,34 @@ export default function UploadPage() {
 
             <div>
               <label className="block text-sm font-semibold text-warm-brown mb-2">
-                영상 파일 <span className="text-muted font-normal">(1분 이내, 루프 재생)</span>
+                영상 파일{' '}
+                <span className="text-muted font-normal">
+                  (1분 이내, 루프 재생)
+                </span>
               </label>
-              <label className={`upload-zone block cursor-pointer rounded-xl overflow-hidden border border-sand ${videoPreview ? 'upload-zone-filled' : ''}`}>
+              <label
+                className={`upload-zone block cursor-pointer rounded-xl overflow-hidden border border-sand ${videoPreview ? 'upload-zone-filled' : ''}`}
+              >
                 {videoPreview ? (
-                  <video src={videoPreview} className="w-full h-48 object-cover" muted />
+                  <video
+                    src={videoPreview}
+                    className="w-full h-48 object-cover"
+                    muted
+                  />
                 ) : (
                   <div className="h-40 flex flex-col items-center justify-center gap-2 text-muted bg-white">
-                    <span className="text-3xl">{uploadType === 'zoom' ? '🌿' : '🎬'}</span>
+                    <span className="text-3xl">
+                      {uploadType === 'zoom' ? '🌿' : '🎬'}
+                    </span>
                     <span className="text-sm">클릭해서 영상 선택</span>
                   </div>
                 )}
-                <input type="file" accept="video/*" className="hidden" onChange={handleVideoChange} />
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={handleVideoChange}
+                />
               </label>
             </div>
 
@@ -189,7 +247,9 @@ export default function UploadPage() {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                  onChange={(e) =>
+                    setThumbnailFile(e.target.files?.[0] || null)
+                  }
                 />
               </label>
             </div>
