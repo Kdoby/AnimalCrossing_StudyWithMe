@@ -7,6 +7,9 @@ import {
 } from "../controllers/conceptVideoController.js";
 
 const router = Router();
+router.get("/", getConceptVideos);
+router.post("/upload", uploadMiddleware, uploadConceptVideo);
+router.get("/:id", streamConceptVideo);
 
 /**
  * @swagger
@@ -45,7 +48,6 @@ const router = Router();
  *                     nullable: true
  *                     example: /uploads/thumb.jpg
  */
-router.get("/", getConceptVideos);
 
 /**
  * @swagger
@@ -96,7 +98,6 @@ router.get("/", getConceptVideos);
  *       500:
  *         description: 저장 실패
  */
-router.post("/upload", uploadMiddleware, uploadConceptVideo);
 
 /**
  * @swagger
@@ -120,6 +121,4 @@ router.post("/upload", uploadMiddleware, uploadConceptVideo);
  *       404:
  *         description: 영상을 찾을 수 없음
  */
-router.get("/:id", streamConceptVideo);
-
 export default router;

@@ -64,13 +64,21 @@ export default function GalleryPage() {
     }
   };
 
-  const actualDuration = isCustomDuration ? (parseInt(customMinutes) || null) : duration;
+  const actualDuration = isCustomDuration
+    ? parseInt(customMinutes) || null
+    : duration;
   const selectedVideos = videos.filter((v) => selectedIds.includes(v.id));
-  const canStart = selectedIds.length > 0 && actualDuration !== null && actualDuration > 0;
+  const canStart =
+    selectedIds.length > 0 && actualDuration !== null && actualDuration > 0;
 
   const handleStart = () => {
     navigate('/study-room', {
-      state: { videos: selectedVideos, duration: actualDuration, mode: 'zoom', bgm: selectedBgm },
+      state: {
+        videos: selectedVideos,
+        duration: actualDuration,
+        mode: 'zoom',
+        bgm: selectedBgm,
+      },
     });
   };
 
@@ -82,7 +90,9 @@ export default function GalleryPage() {
             <BackButton onClick={() => navigate('/')} />
             <div>
               <h1 className="text-xl font-bold text-warm-brown">🌿 줌공부</h1>
-              <p className="text-xs text-muted mt-0.5">주민을 골라 공부방을 만들어보세요</p>
+              <p className="text-xs text-muted mt-0.5">
+                주민을 골라 공부방을 만들어보세요
+              </p>
             </div>
           </div>
         </div>
@@ -139,7 +149,11 @@ export default function GalleryPage() {
                 <SelectChip
                   key={d.label}
                   label={d.label}
-                  selected={d.value === null ? isCustomDuration : duration === d.value && !isCustomDuration}
+                  selected={
+                    d.value === null
+                      ? isCustomDuration
+                      : duration === d.value && !isCustomDuration
+                  }
                   onClick={() => handleDurationSelect(d)}
                 />
               ))}
@@ -160,16 +174,24 @@ export default function GalleryPage() {
               </div>
             )}
 
-            <p className="text-xs font-bold text-warm-brown mb-2 mt-1">🎵 배경음악</p>
+            <p className="text-xs font-bold text-warm-brown mb-2 mt-1">
+              🎵 배경음악
+            </p>
             <div className="flex flex-wrap gap-2 mb-4">
               {audioList.map((audio) => {
-                const isSelected = selectedBgm?.id === audio.id && selectedBgm?.title === audio.title;
+                const isSelected =
+                  selectedBgm?.id === audio.id &&
+                  selectedBgm?.title === audio.title;
                 return (
                   <SelectChip
                     key={audio.id ?? 'none'}
                     label={audio.title}
-                    selected={isSelected || (selectedBgm === null && audio.id === null)}
-                    onClick={() => setSelectedBgm(audio.id === null ? null : audio)}
+                    selected={
+                      isSelected || (selectedBgm === null && audio.id === null)
+                    }
+                    onClick={() =>
+                      setSelectedBgm(audio.id === null ? null : audio)
+                    }
                   />
                 );
               })}

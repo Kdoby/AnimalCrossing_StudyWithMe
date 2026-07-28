@@ -1,25 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import ConceptVideoCard from '../../components/ConceptVideoCard';
-import Button from '../../components/Button';
-import SelectChip from '../../components/SelectChip';
-import BackButton from '../../components/BackButton';
-import { getConceptVideos } from '../../services/conceptVideoService';
-import { queryKeys } from '../../services/queryKeys';
-import { DURATIONS } from '../../constant/durations';
-import { useAudioList } from '../../hooks/useAudioList';
+import ConceptVideoCard from '../../../components/ConceptVideoCard';
+import Button from '../../../components/Button';
+import SelectChip from '../../../components/SelectChip';
+import BackButton from '../../../components/BackButton';
+import { getConceptVideosEmbed } from '../../../services/embed/conceptVideoService';
+import { queryKeys } from '../../../services/queryKeys';
+import { DURATIONS } from '../../../constant/durations';
+import { useAudioList } from '../../../hooks/useAudioList';
 
 const FALLBACK_CONCEPT_VIDEOS = [
-  { id: 1, title: '학교 공부방', videoUrl: '/dongsoop_study_1.mp4' },
-  { id: 2, title: '학교 공부방2', videoUrl: '/dongsoop_study_2.mp4' },
-  { id: 3, title: '학교 공부방3', videoUrl: '/dongsoop_study_3.mp4' },
-  { id: 4, title: '학교 공부방4', videoUrl: '/dongsoop_study_4.mp4' },
-  { id: 5, title: '학교 공부방5', videoUrl: '/dongsoop_study_5.mp4' },
-  { id: 6, title: '박물관 조용한 오전', videoUrl: null },
+  { id: 1, title: '학교 공부방', youtubeUrl: null, thumbnailUrl: null },
+  { id: 2, title: '카페 오후', youtubeUrl: null, thumbnailUrl: null },
+  { id: 3, title: '도서관 저녁', youtubeUrl: null, thumbnailUrl: null },
+  { id: 4, title: '박물관 조용한 오전', youtubeUrl: null, thumbnailUrl: null },
 ];
 
-export default function ConceptGalleryPage() {
+export default function ConceptGalleryEmbedPage() {
   const navigate = useNavigate();
 
   const [selectedId, setSelectedId] = useState(null);
@@ -31,8 +29,8 @@ export default function ConceptGalleryPage() {
   const audioList = useAudioList();
 
   const { data: videos = FALLBACK_CONCEPT_VIDEOS } = useQuery({
-    queryKey: queryKeys.conceptVideos.list({}),
-    queryFn: () => getConceptVideos({}),
+    queryKey: [...queryKeys.conceptVideos.list({}), 'embed'],
+    queryFn: () => getConceptVideosEmbed({}),
   });
 
   const toggleSelect = (video) => {
@@ -68,6 +66,7 @@ export default function ConceptGalleryPage() {
         duration: actualDuration,
         mode: 'single',
         bgm: selectedBgm,
+        embedMode: true,
       },
     });
   };
@@ -90,7 +89,7 @@ export default function ConceptGalleryPage() {
         {videos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-muted">
             <span className="text-5xl mb-4">🎬</span>
-            <p className="text-sm">아직 업로드된 컨셉 영상이 없어요</p>
+            <p className="text-sm">아직 등록된 컨셉 영상이 없어요</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -99,7 +98,6 @@ export default function ConceptGalleryPage() {
                 key={video.id}
                 title={video.title}
                 thumbnailUrl={video.thumbnailUrl}
-                duration={video.duration}
                 index={i}
                 selected={selectedId === video.id}
                 onSelect={() => toggleSelect(video)}

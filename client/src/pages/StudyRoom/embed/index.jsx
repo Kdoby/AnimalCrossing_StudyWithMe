@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   playerReducer,
   initialPlayerState,
-} from '../../reducers/playerReducer';
+} from '../../../reducers/playerReducer';
+import { extractYouTubeId } from '../../../lib/youtube';
 
 function formatTime(seconds) {
   const h = Math.floor(seconds / 3600);
@@ -21,7 +22,15 @@ function getGridClass(count) {
   return 'grid-cols-3';
 }
 
-export default function StudyRoomPage() {
+function loadYouTubeAPI() {
+  if (document.getElementById('yt-api-script')) return;
+  const tag = document.createElement('script');
+  tag.id = 'yt-api-script';
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+
+export default function StudyRoomEmbedPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const config = location.state;
@@ -30,11 +39,11 @@ export default function StudyRoomPage() {
   const [bgmOn, setBgmOn] = useState(false);
   const [volume, setVolume] = useState(0.5);
 
-  const videoRefs = useRef([]);
+  const ytPlayersRef = useRef([]);
   const intervalRef = useRef(null);
+  const loopPollRef = useRef(null);
   const audioRef = useRef(null);
 
-  // config.bgm이 있을 때만 오디오 엘리먼트가 의미 있음
   const hasBgm = Boolean(config?.bgm?.url);
 
   useEffect(() => {
@@ -43,6 +52,68 @@ export default function StudyRoomPage() {
       return;
     }
     dispatch({ type: 'INIT', payload: config.duration * 60 });
+  }, []);
+
+  // YouTube IFrame API로 플레이어 초기화
+  useEffect(() => {
+    if (!config) return;
+    const videos = config.videos;
+
+    loadYouTubeAPI();
+
+    const initPlayers = () => {
+      videos.forEach((video, i) => {
+        const videoId = extractYouTubeId(video.youtubeUrl);
+        if (!videoId) return;
+
+        ytPlayersRef.current[i] = new window.YT.Player(`yt-player-${video.id}`, {
+          width: '100%',
+          height: '100%',
+          videoId,
+          playerVars: {
+            autoplay: 1,
+            mute: 1,
+            controls: 0,
+            disablekb: 1,
+            rel: 0,
+            playsinline: 1,
+            modestbranding: 1,
+          },
+        });
+      });
+    };
+
+    if (window.YT?.Player) {
+      initPlayers();
+    } else {
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        prev?.();
+        initPlayers();
+      };
+    }
+
+    return () => {
+      ytPlayersRef.current.forEach((p) => p?.destroy?.());
+      ytPlayersRef.current = [];
+    };
+  }, []);
+
+  // PLAYING 상태에서 끝나기 0.3초 전에 seekTo(0) — ENDED 상태 자체를 막아 YouTube UI 차단
+  useEffect(() => {
+    loopPollRef.current = setInterval(() => {
+      ytPlayersRef.current.forEach((player) => {
+        if (!player?.getDuration) return;
+        try {
+          const duration = player.getDuration();
+          const current = player.getCurrentTime();
+          if (duration > 0 && current >= duration - 0.3) {
+            player.seekTo(0, true);
+          }
+        } catch {}
+      });
+    }, 200);
+    return () => clearInterval(loopPollRef.current);
   }, []);
 
   useEffect(() => {
@@ -56,11 +127,12 @@ export default function StudyRoomPage() {
   }, [state.paused, state.finished]);
 
   useEffect(() => {
-    videoRefs.current.forEach((v) => {
-      if (!v) return;
-      if (state.paused) v.pause();
-      else v.play().catch(() => {});
+    ytPlayersRef.current.forEach((player) => {
+      if (!player) return;
+      if (state.paused) player.pauseVideo?.();
+      else player.playVideo?.();
     });
+
     const audio = audioRef.current;
     if (!audio) return;
     if (state.paused) audio.pause();
@@ -103,7 +175,6 @@ export default function StudyRoomPage() {
         </span>
 
         <div className="flex items-center gap-4">
-          {/* BGM 선택 시에만 뮤트 토글 + 볼륨 슬라이더 표시 */}
           {hasBgm && (
             <div className="flex items-center gap-2">
               <button
@@ -156,36 +227,32 @@ export default function StudyRoomPage() {
         </div>
       </div>
 
-      {/* 선택된 BGM이 있을 때만 audio 엘리먼트 렌더링 */}
       {hasBgm && <audio ref={audioRef} src={config.bgm.url} loop />}
 
       <div className={`flex-1 grid ${gridClass} gap-4 p-8 overflow-hidden`}>
-        {videos.map((video, i) => (
-          <div
-            key={video.id}
-            className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center"
-          >
-            {video.videoUrl ? (
-              <video
-                ref={(el) => (videoRefs.current[i] = el)}
-                src={video.videoUrl}
-                loop
-                autoPlay
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-sage/20 to-leaf/10">
-                <span className="text-6xl animate-float">🌿</span>
-              </div>
-            )}
+        {videos.map((video, i) => {
+          const videoId = extractYouTubeId(video.youtubeUrl);
+          const displayName = video.animalName ?? video.title;
 
-            <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-md">
-              {video.animalName ?? video.title}
+          return (
+            <div
+              key={video.id}
+              className="relative bg-black rounded-xl overflow-hidden flex items-center justify-center"
+            >
+              {videoId ? (
+                <div id={`yt-player-${video.id}`} className="w-full h-full" />
+              ) : (
+                <div className="flex items-center justify-center w-full h-full bg-linear-to-br from-sage/20 to-leaf/10">
+                  <span className="text-6xl animate-float">🌿</span>
+                </div>
+              )}
+
+              <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-md pointer-events-none">
+                {displayName}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

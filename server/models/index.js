@@ -2,4 +2,6 @@
 export { Video } from "./Video.js";
 export { ConceptVideo } from "./ConceptVideo.js";
 export { Audio } from "./Audio.js";
+export { VideoEmbed } from "./embed/Video.js";
+export { ConceptVideoEmbed } from "./embed/ConceptVideo.js";
 export { sequelize, syncDB } from "../config/database.js";
