@@ -39,10 +39,11 @@ export default function GalleryPage() {
 
   const audioList = useAudioList();
 
-  const { data: videos = FALLBACK_VIDEOS } = useQuery({
+  const { data, isPending, isError } = useQuery({
     queryKey: queryKeys.videos.list({ sort }),
     queryFn: () => getVideos({ sort }),
   });
+  const videos = isError ? FALLBACK_VIDEOS : (data ?? []);
 
   const toggleSelect = (video) => {
     setSelectedIds((prev) => {
@@ -110,7 +111,12 @@ export default function GalleryPage() {
           ))}
         </div>
 
-        {videos.length === 0 ? (
+        {isPending ? (
+          <div className="flex flex-col items-center justify-center py-24 text-muted">
+            <span className="text-5xl mb-4 animate-bounce">🌿</span>
+            <p className="text-sm">불러오는 중...</p>
+          </div>
+        ) : videos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-muted">
             <span className="text-5xl mb-4">🌿</span>
             <p className="text-sm">아직 업로드된 영상이 없어요</p>

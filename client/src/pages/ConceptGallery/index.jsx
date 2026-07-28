@@ -30,10 +30,11 @@ export default function ConceptGalleryPage() {
 
   const audioList = useAudioList();
 
-  const { data: videos = FALLBACK_CONCEPT_VIDEOS } = useQuery({
+  const { data, isPending, isError } = useQuery({
     queryKey: queryKeys.conceptVideos.list({}),
     queryFn: () => getConceptVideos({}),
   });
+  const videos = isError ? FALLBACK_CONCEPT_VIDEOS : (data ?? []);
 
   const toggleSelect = (video) => {
     setSelectedId((prev) => (prev === video.id ? null : video.id));
@@ -87,7 +88,12 @@ export default function ConceptGalleryPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 pt-8">
-        {videos.length === 0 ? (
+        {isPending ? (
+          <div className="flex flex-col items-center justify-center py-24 text-muted">
+            <span className="text-5xl mb-4 animate-bounce">🎬</span>
+            <p className="text-sm">불러오는 중...</p>
+          </div>
+        ) : videos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-muted">
             <span className="text-5xl mb-4">🎬</span>
             <p className="text-sm">아직 업로드된 컨셉 영상이 없어요</p>
