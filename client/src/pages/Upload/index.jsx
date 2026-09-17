@@ -125,33 +125,41 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream">
-      <div className="max-w-lg mx-auto px-6 py-12">
+    <div className="min-h-screen bg-cream relative overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-sky/15 to-transparent pointer-events-none" />
+
+      <div className="relative max-w-lg mx-auto px-6 py-12">
         <BackButton onClick={() => navigate('/')} />
 
-        <h1 className="text-2xl font-bold text-warm-brown mt-6 mb-2">
-          영상 업로드
+        <h1 className="font-display text-3xl text-warm-brown mt-6 mb-2 flex items-center gap-2">
+          📮 영상 업로드
         </h1>
         <p className="text-sm text-muted mb-8">어떤 종류의 영상을 올릴까요?</p>
 
         {/* 업로드 유형 선택 */}
         <div className="grid grid-cols-2 gap-3 mb-8">
-          {UPLOAD_TYPES.map((type) => {
+          {UPLOAD_TYPES.map((type, i) => {
             const selected = uploadType === type.id;
             return (
               <button
                 key={type.id}
                 onClick={() => handleTypeSelect(type.id)}
-                className={`text-left rounded-2xl border-2 px-4 py-4 transition-all duration-200 cursor-pointer
+                className={`group relative text-left rounded-2xl border-2 px-4 py-4 transition-all duration-300 cursor-pointer
+                  ${i === 0 ? 'rotate-0 sm:-rotate-1' : 'rotate-0 sm:rotate-1'}
                   ${
                     selected
-                      ? 'border-leaf bg-leaf/5 shadow-sm'
-                      : 'border-sand bg-white hover:border-sage hover:bg-sage/5'
+                      ? 'border-leaf bg-leaf/5 shadow-md -translate-y-1 rotate-0'
+                      : 'border-sand bg-white hover:border-sage hover:bg-sage/5 hover:-translate-y-0.5 shadow-sm hover:shadow-md'
                   }`}
               >
-                <span className="text-2xl block mb-2">{type.emoji}</span>
+                {selected && (
+                  <span className="absolute -top-2 -right-2 w-7 h-7 rounded-lg bg-leaf text-white flex items-center justify-center shadow-md rotate-6 border-2 border-white text-xs font-bold">
+                    ✓
+                  </span>
+                )}
+                <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform duration-300 inline-block">{type.emoji}</span>
                 <p
-                  className={`text-sm font-bold mb-0.5 ${selected ? 'text-leaf' : 'text-warm-brown'}`}
+                  className={`font-display text-base mb-0.5 ${selected ? 'text-leaf' : 'text-warm-brown'}`}
                 >
                   {type.label}
                 </p>
@@ -165,7 +173,7 @@ export default function UploadPage() {
 
         {/* 업로드 유형 선택 후 폼 표시 */}
         {uploadType && (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 animate-fade-slide-up">
             {uploadType === 'zoom' ? (
               <div>
                 <label className="block text-sm font-semibold text-warm-brown mb-2">
@@ -241,7 +249,8 @@ export default function UploadPage() {
               <label className="block text-sm font-semibold text-warm-brown mb-2">
                 썸네일 <span className="text-muted font-normal">(선택)</span>
               </label>
-              <label className="block w-full px-4 py-3 rounded-xl border border-sand bg-white cursor-pointer text-sm text-muted hover:bg-sand/30 transition-colors duration-200 text-center">
+              <label className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl border-2 border-dashed border-sand bg-white cursor-pointer text-sm text-muted hover:border-sage hover:bg-sage/5 transition-colors duration-200 text-center">
+                <span>🖼️</span>
                 {thumbnailFile ? thumbnailFile.name : '이미지 파일 선택'}
                 <input
                   type="file"
@@ -254,7 +263,11 @@ export default function UploadPage() {
               </label>
             </div>
 
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && (
+              <p className="flex items-center gap-1.5 bg-red-50 border border-red-200 text-red-500 text-sm rounded-xl px-3 py-2.5">
+                <span>⚠️</span> {error}
+              </p>
+            )}
 
             <Button onClick={handleSubmit} disabled={isPending} fullWidth>
               {isPending ? '업로드 중...' : '업로드하기'}

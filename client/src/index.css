@@ -1,6 +1,9 @@
 /* Pretendard: 한국어에 최적화된 폰트. CDN에서 불러옴 */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
 
+/* Jua: 손글씨 느낌의 동글동글한 표시용 폰트 (제목 등 포인트 텍스트 전용) */
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
 /* Tailwind의 모든 유틸리티 클래스를 사용 가능하게 불러옴 */
 @import 'tailwindcss';
 
@@ -24,6 +27,8 @@
 
   /* 기본 폰트. -apple-system은 폰트 로드 실패 시 시스템 폰트로 fallback */
   --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+  /* 표시용 폰트. 제목처럼 포인트를 줄 곳에만 제한적으로 사용 (font-display) */
+  --font-display: 'Jua', var(--font-sans);
 }
 
 /* ── Keyframes ───────────────────────────────────────────────────────────────
@@ -50,6 +55,17 @@
   }
   50% {
     transform: translateY(-12px); /* 최대 12px 위로 이동 */
+  }
+}
+
+/* 구름 모양 요소가 좌우로 아주 천천히 흔들리는 효과 */
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(14px);
   }
 }
 
@@ -178,6 +194,14 @@
   animation-delay: 0.4s;
 }
 
+/* drift 애니메이션 적용 (구름) */
+.animate-drift {
+  animation: drift 6s ease-in-out infinite;
+}
+.drift-delay-1 {
+  animation-delay: 1.8s;
+}
+
 /* 무한 가로 스크롤 트랙. width: max-content로 콘텐츠 너비만큼 늘어남 */
 .marquee-track {
   width: max-content;
@@ -259,6 +283,24 @@
 /* 파일이 선택됐을 때: 실선 + leaf 색으로 변경 */
 .upload-zone-filled {
   border: 2px solid #4a7c59;
+}
+
+/* 필름 티켓처럼 위쪽 가장자리가 반원으로 뜯겨나간 듯한 절취선 효과 (하단 고정 패널에서 사용) */
+.film-edge {
+  position: relative;
+}
+.film-edge::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 0;
+  right: 0;
+  height: 14px;
+  pointer-events: none;
+  /* 6.5px 지점부터 cream(배경색)으로 채워 반원이 뚫린 것처럼 보이게 함 */
+  background-image: radial-gradient(circle at 14px 7px, transparent 6.5px, #f5f3ee 7px);
+  background-size: 28px 14px;
+  background-repeat: repeat-x;
 }
 
 /* 카드 배경에 깔리는 점 패턴 (radial-gradient로 동그란 점을 규칙적으로 배치) */

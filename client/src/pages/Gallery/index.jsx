@@ -86,16 +86,25 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen bg-cream pb-40">
       <div className="sticky top-0 z-20 bg-cream/90 backdrop-blur-sm border-b border-sand/60">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <BackButton onClick={() => navigate('/')} />
             <div>
-              <h1 className="text-xl font-bold text-warm-brown">🌿 줌공부</h1>
+              <h1 className="font-display text-2xl text-warm-brown">🌿 줌공부</h1>
               <p className="text-xs text-muted mt-0.5">
                 주민을 골라 공부방을 만들어보세요
               </p>
             </div>
           </div>
+          <span
+            className={`flex-shrink-0 rounded-lg px-3 py-2 text-xs font-bold border-2 -rotate-1 transition-colors duration-200 ${
+              selectedIds.length > 0
+                ? 'bg-leaf/10 border-leaf text-leaf'
+                : 'bg-white border-sand text-muted'
+            }`}
+          >
+            정원 {selectedIds.length} / 6
+          </span>
         </div>
       </div>
 
@@ -128,25 +137,30 @@ export default function GalleryPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {videos.map((video, i) => (
-              <VideoCard
-                key={video.id}
-                title={video.title}
-                animalName={video.animalName}
-                thumbnailUrl={video.thumbnailUrl}
-                index={i}
-                selected={selectedIds.includes(video.id)}
-                onSelect={() => toggleSelect(video)}
-              />
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-8 [&>*:nth-child(3n+2)]:sm:mt-5">
+            {videos.map((video, i) => {
+              const selectedOrder = selectedIds.indexOf(video.id) + 1;
+              return (
+                <VideoCard
+                  key={video.id}
+                  title={video.title}
+                  animalName={video.animalName}
+                  thumbnailUrl={video.thumbnailUrl}
+                  index={i}
+                  selected={selectedOrder > 0}
+                  selectedOrder={selectedOrder > 0 ? selectedOrder : null}
+                  disabled={selectedOrder === 0 && selectedIds.length >= 6}
+                  onSelect={() => toggleSelect(video)}
+                />
+              );
+            })}
           </div>
         )}
       </div>
 
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-sand shadow-xl">
-          <div className="max-w-5xl mx-auto px-6 py-4">
+        <div className="film-edge fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-sand shadow-xl rounded-t-2xl">
+          <div className="max-w-5xl mx-auto px-6 pt-5 pb-4">
             <p className="text-xs font-bold text-warm-brown mb-3">
               {selectedIds.length}명 선택됨 · 공부 시간을 선택해주세요
             </p>

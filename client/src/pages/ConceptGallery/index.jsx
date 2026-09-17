@@ -79,15 +79,17 @@ export default function ConceptGalleryPage() {
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-4">
           <BackButton onClick={() => navigate('/')} />
           <div>
-            <h1 className="text-xl font-bold text-warm-brown">🎬 컨셉영상</h1>
+            <h1 className="font-display text-2xl text-warm-brown flex items-center gap-1.5">
+              🎬 컨셉영상
+            </h1>
             <p className="text-xs text-muted mt-0.5">
-              영상을 하나 골라 집중해보세요
+              무드가 맞는 영상을 하나 골라 몰입해보세요
             </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 pt-8">
+      <div className="max-w-5xl mx-auto px-6 pt-10">
         {isPending ? (
           <div className="flex flex-col items-center justify-center py-24 text-muted">
             <span className="text-5xl mb-4 animate-bounce">🎬</span>
@@ -99,7 +101,7 @@ export default function ConceptGalleryPage() {
             <p className="text-sm">아직 업로드된 컨셉 영상이 없어요</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-8 [&>*:nth-child(even)]:sm:mt-5">
             {videos.map((video, i) => (
               <ConceptVideoCard
                 key={video.id}
@@ -108,6 +110,7 @@ export default function ConceptGalleryPage() {
                 duration={video.duration}
                 index={i}
                 selected={selectedId === video.id}
+                dimmed={selectedId !== null && selectedId !== video.id}
                 onSelect={() => toggleSelect(video)}
               />
             ))}
@@ -116,10 +119,10 @@ export default function ConceptGalleryPage() {
       </div>
 
       {selectedId !== null && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-sand shadow-xl">
-          <div className="max-w-5xl mx-auto px-6 py-4">
+        <div className="film-edge fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-sand shadow-xl rounded-t-2xl">
+          <div className="max-w-5xl mx-auto px-6 pt-5 pb-4">
             <p className="text-xs font-bold text-warm-brown mb-3">
-              영상 1개 선택됨 · 공부 시간을 선택해주세요
+              🎞️ 영상 1개 선택됨 · 공부 시간을 선택해주세요
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
               {DURATIONS.map((d) => (
