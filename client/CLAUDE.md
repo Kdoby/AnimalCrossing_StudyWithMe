@@ -26,6 +26,7 @@
 - 카드류 컴포넌트는 `shadow-md` 기본, hover 시 `shadow-xl` + 미세한 이동 효과 (`hover:-translate-y-2`)
 - 트랜지션은 `transition-all duration-300` 기본값
 - 로딩·에러·빈 상태(empty state)를 항상 처리
+- 뱃지/태그/칩 텍스트 앞에 상태창처럼 보이는 작은 `rounded-full` 점(`animate-pulse` 점 포함)을 장식으로 붙이지 말 것. 사용자가 명확히 싫어하는 패턴이므로 절대 사용 금지
 
 ## 라우팅
 
